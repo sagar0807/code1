@@ -1,0 +1,219 @@
+package gov.naco.soch.inventory.service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import gov.naco.soch.dto.AcceptConsignmentDto;
+import gov.naco.soch.dto.BatchDto;
+import gov.naco.soch.dto.DispatchDetailedDto;
+import gov.naco.soch.dto.ReceiptDto;
+import gov.naco.soch.dto.ReceiptSupplierDto;
+import gov.naco.soch.entity.ConsignmentStatusMaster;
+import gov.naco.soch.entity.Dispatch;
+import gov.naco.soch.entity.DispatchReceiptRemark;
+import gov.naco.soch.entity.DispatchStatusMaster;
+import gov.naco.soch.entity.DispatchStatusTracking;
+import gov.naco.soch.entity.Grn1StatusMaster;
+import gov.naco.soch.entity.Grn2StatusMaster;
+import gov.naco.soch.entity.Receipt;
+import gov.naco.soch.entity.ReceiptBatch;
+import gov.naco.soch.entity.ReceiptStatusMaster;
+import gov.naco.soch.entity.UserMaster;
+import gov.naco.soch.enums.FacilityTypeEnum;
+import gov.naco.soch.inventory.mapper.DispatchMapperUtil;
+import gov.naco.soch.inventory.mapper.ReceiptMapperUtil;
+import gov.naco.soch.repository.DispatchRepository;
+import gov.naco.soch.repository.DispatchStatusTrackingRepository;
+import gov.naco.soch.repository.ReceiptRepository;
+
+@Service
+@Transactional
+public class ReceiptService {
+
+	@Autowired
+	private DispatchRepository dispatchRepository;
+
+	@Autowired
+	private ReceiptRepository receiptRepository;
+
+	@Autowired
+	private DispatchStatusTrackingRepository dispatchStatusTrackingRepository;
+
+	public List<DispatchDetailedDto> getAllDispatchedStocks(Long facilityId, String facilityType) {
+		List<Long> facilityTypeIds = new ArrayList<>();
+
+		switch (facilityType) {
+		case "sacs":
+			facilityTypeIds.add(FacilityTypeEnum.SACS.getFacilityType());
+			break;
+		case "supplier":
+			facilityTypeIds.add(FacilityTypeEnum.SUPPLIER.getFacilityType());
+			break;
+		default:
+			break;
+		}
+		List<Dispatch> dispatchedStocks = dispatchRepository
+				.findAllByShipToConsignee_IdAndDispatchStatusMaster_IdAndConsignor_FacilityType_IdIn(facilityId, 1,
+						facilityTypeIds);
+		List<DispatchDetailedDto> dispatchDetailedDtos = new ArrayList<>();
+		dispatchedStocks.forEach(dispatchedStock -> {
+			DispatchDetailedDto dispatchDetailedDto = DispatchMapperUtil
+					.mapDispatchToDispatchDetailedDto(dispatchedStock, null);
+			dispatchDetailedDtos.add(dispatchDetailedDto);
+		});
+
+		return dispatchDetailedDtos;
+
+	}
+
+	public List<ReceiptSupplierDto> listAllSupplierReceipts(String user) {
+		List<Receipt> receiptList = receiptRepository.findAll();
+		return ReceiptMapperUtil.mappDispatchListToReceiptSupplierDto(receiptList, user);
+
+	}
+
+	public ReceiptDto saveReceiptDetails(@Valid ReceiptDto receiptDto) {
+
+		Dispatch dispatch = new Dispatch();
+		Receipt receipt = new Receipt();
+		ConsignmentStatusMaster consignmentStatusMaster = new ConsignmentStatusMaster();
+		DispatchStatusMaster dispatchStatusMaster = new DispatchStatusMaster();
+		Grn1StatusMaster grn1StatusMaster = new Grn1StatusMaster();
+		Grn2StatusMaster grn2StatusMaster = new Grn2StatusMaster();
+		ReceiptStatusMaster receiptStatusMaster = new ReceiptStatusMaster();
+
+		if (!receiptDto.getIsProductMatch()) {
+			grn1StatusMaster.setId(2);
+			receiptStatusMaster.setId(3);
+			consignmentStatusMaster.setId(4);
+			dispatchStatusMaster.setId(4);
+		}
+
+		if (receiptDto.getIsProductMatch() && !receiptDto.getIsBatchMatch()) {
+			grn1StatusMaster.setId(2);
+			receiptStatusMaster.setId(4);
+			consignmentStatusMaster.setId(4);
+			dispatchStatusMaster.setId(4);
+		}
+		Integer totalReceived = 0;
+		for (BatchDto batch : receiptDto.getBatches()) {
+			if (batch.getReceivedQuantity() != null) {
+				totalReceived = totalReceived + batch.getReceivedQuantity().intValue();
+			}
+
+		}
+
+		if (receiptDto.getIsProductMatch() && receiptDto.getIsBatchMatch()) {
+			if (receiptDto.getBatches() != null) {
+				for (BatchDto batch : receiptDto.getBatches()) {
+					Integer quantityMismatch = 0;
+					if (batch.getDamagedQuantity() != null) {
+						quantityMismatch = batch.getQuantity().intValue()
+								- (batch.getReceivedQuantity().intValue() + batch.getDamagedQuantity().intValue());
+					}
+
+					if (receiptDto.getProductQuantity().intValue() == totalReceived
+							&& (batch.getDamagedQuantity() == null)) {
+						grn1StatusMaster.setId(1);
+						receiptStatusMaster.setId(2);
+						consignmentStatusMaster.setId(2);
+						dispatchStatusMaster.setId(2);
+						grn2StatusMaster.setId(2);
+						receipt.setGrn2StatusMaster(grn2StatusMaster);
+						receipt.setGrn2Date(LocalDateTime.now());
+					}
+					if ((batch.getDamagedQuantity() != null) && quantityMismatch.intValue() == 0) {
+						grn1StatusMaster.setId(1);
+						receiptStatusMaster.setId(7);
+						consignmentStatusMaster.setId(2);
+						dispatchStatusMaster.setId(2);
+						grn2StatusMaster.setId(2);
+						receipt.setGrn2StatusMaster(grn2StatusMaster);
+						receipt.setGrn2Date(LocalDateTime.now());
+					}
+					if ((batch.getDamagedQuantity() != null) && quantityMismatch.intValue() != 0) {
+						grn1StatusMaster.setId(1);
+						receiptStatusMaster.setId(8);
+						consignmentStatusMaster.setId(2);
+						dispatchStatusMaster.setId(2);
+						grn2StatusMaster.setId(2);
+						receipt.setGrn2StatusMaster(grn2StatusMaster);
+						receipt.setGrn2Date(LocalDateTime.now());
+					}
+					if ((batch.getDamagedQuantity() == null || batch.getDamagedQuantity().intValue() == 0)
+							&& ((batch.getQuantity().intValue() - batch.getReceivedQuantity().intValue()) != 0)) {
+						grn1StatusMaster.setId(1);
+						receiptStatusMaster.setId(5);
+						consignmentStatusMaster.setId(2);
+						dispatchStatusMaster.setId(2);
+						grn2StatusMaster.setId(2);
+						receipt.setGrn2StatusMaster(grn2StatusMaster);
+						receipt.setGrn2Date(LocalDateTime.now());
+					}
+				}
+			}
+		}
+
+		receipt.setIsBatchMatch(receiptDto.getIsBatchMatch());
+		receipt.setIsProductMatch(receiptDto.getIsProductMatch());
+		receipt.setGrn1StatusMaster(grn1StatusMaster);
+		receipt.setReceiptStatusMaster(receiptStatusMaster);
+		receipt.setGrn1Date(LocalDateTime.now());
+		dispatch.setDispatchId(receiptDto.getDispatchId());
+		receipt.setDispatch(dispatch);
+
+		Set<ReceiptBatch> receiptBatches = ReceiptMapperUtil.mapBatchDtoToReceiptBatches(receiptDto.getBatches(),
+				receipt);
+		receipt.setReceiptBatches(receiptBatches);
+		Set<DispatchReceiptRemark> dispatchReceiptRemarks = ReceiptMapperUtil.mapReceiptDtoToDispatchReceiptRemark(
+				receiptDto, dispatch, receipt, receiptStatusMaster.getId(), dispatchStatusMaster.getId());
+		receipt.setDispatchReceiptRemarks(dispatchReceiptRemarks);
+
+		receipt = receiptRepository.save(receipt);
+
+		DispatchStatusTracking dispatchStatusTracking = new DispatchStatusTracking();
+		dispatchStatusTracking.setDispatch(dispatch);
+		dispatchStatusTracking.setReceipt(receipt);
+		dispatchStatusTracking.setReceiptStatusMaster(receiptStatusMaster);
+		UserMaster user = new UserMaster();
+		user.setId(receiptDto.getUserId());
+		dispatchStatusTracking.setUserMaster(user);
+		dispatchStatusTrackingRepository.save(dispatchStatusTracking);
+
+		if (receiptDto.getDispatchId() != null) {
+			dispatch = dispatchRepository.findByDispatchId(receiptDto.getDispatchId());
+			dispatch.setDispatchStatusMaster(dispatchStatusMaster);
+			dispatch.setConsignmentStatusMaster(consignmentStatusMaster);
+			dispatchRepository.save(dispatch);
+		}
+
+		return receiptDto;
+	}
+
+	public DispatchDetailedDto viewReceiptByReceiptIdFromSupplier(Integer receiptId) {
+		Optional<Receipt> receipt = receiptRepository.findById(receiptId);
+		Dispatch dispatch = receipt.get().getDispatch();
+		DispatchDetailedDto detailedDto = new DispatchDetailedDto();
+		detailedDto = DispatchMapperUtil.mapDispatchToDispatchDetailedDto(dispatch, null);
+		return detailedDto;
+	}
+
+	public AcceptConsignmentDto acceptConsignement(Integer receiptId, AcceptConsignmentDto acceptConsignmentDto) {
+		Optional<Receipt> receipt = receiptRepository.findById(receiptId);
+		Receipt receiptUpdate = receipt.get();
+		receiptUpdate = ReceiptMapperUtil.mapConsignmentBatchDtoToreceiptUpdate(receipt.get(), acceptConsignmentDto);
+
+		receiptRepository.save(receiptUpdate);
+		return acceptConsignmentDto;
+	}
+
+}

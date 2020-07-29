@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity ICTCTestResult.
+    -->
+    <changeSet id="20200506014201-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="ictc_beneficiary_id"
+                                 baseTableName="ictc_test_results"
+                                 constraintName="fk_ictctest_result_ictc_beneficiary_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_beneficiary"/>
+
+        <addForeignKeyConstraint baseColumnNames="ictc_sample_collection_id"
+                                 baseTableName="ictc_test_results"
+                                 constraintName="fk_ictctest_result_ictc_sample_collection_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_sample_collection"/>
+
+        <addForeignKeyConstraint baseColumnNames="ictc_visit_id"
+                                 baseTableName="ictc_test_results"
+                                 constraintName="fk_ictctest_result_ictc_visit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_visit"/>
+
+    </changeSet>
+</databaseChangeLog>

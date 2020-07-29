@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+
+    <property name="floatType" value="float4" dbms="postgresql, h2"/>
+    <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
+
+    <!--
+        Added the entity ICTCBeneficiaryFollowUpView.
+    -->
+    <changeSet id="20200508094045-1" author="jhipster">
+        <createTable tableName="ictcbeneficiary_follow_up_view">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pid" type="varchar(99)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="jhi_uid" type="varchar(99)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="middle_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="mobile_number" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="age" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="gender" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="category" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="follow_up_date" type="date">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="follow_up_type" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="expected_delivery_date" type="date">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="pregnancy_imp_date" type="date">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="delivery_date" type="date">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="remarks" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="is_completed" type="boolean">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="beneficiary_status" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="beneficiary_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="visit_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="test_result_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="ictc_beneficiary_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="facility_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
+        </createTable>
+        
+    </changeSet>
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
+</databaseChangeLog>

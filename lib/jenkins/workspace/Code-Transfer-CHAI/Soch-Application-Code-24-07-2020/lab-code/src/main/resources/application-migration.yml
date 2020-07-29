@@ -1,0 +1,24 @@
+spring:
+   jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      database: POSTGRESQL
+      generate-ddl: false
+      open-in-view: false
+      show-sql: false
+      hibernate:
+         ddl-auto: none
+         use-new-id-generator-mappings: false
+         format_sql: true
+   datasource:
+      dataSourceClassName: org.postgresql.Driver
+      url: jdbc:postgresql://13.234.214.47:5432/mig_db01?currentSchema=soch
+      username: postgres
+      password: sanju@123
+logging:
+   level:
+       root: ERROR
+       org.springframework: ERROR
+       com.naco.soch: ERROR
+       org.hibernate: ERROR
+mhl:
+  auth_key: c2285c7c4cdaf31f8486b35f171c643c

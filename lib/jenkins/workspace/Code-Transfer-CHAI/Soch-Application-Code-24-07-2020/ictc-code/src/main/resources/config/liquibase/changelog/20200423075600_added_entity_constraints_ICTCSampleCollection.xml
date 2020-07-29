@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <!--
+        Added the constraints for entity ICTCSampleCollection.
+    -->
+    <changeSet id="20200423075600-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="beneficiary_id"
+                                 baseTableName="ictc_sample_collection"
+                                 constraintName="fk_ictc_sample_collection_beneficiary_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="beneficiary"/>
+
+        <addForeignKeyConstraint baseColumnNames="ictc_beneficiary_id"
+                                 baseTableName="ictc_sample_collection"
+                                 constraintName="fk_ictc_sample_collection_ictc_beneficiary_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_beneficiary"/>
+
+        <addForeignKeyConstraint baseColumnNames="visit_id"
+                                 baseTableName="ictc_sample_collection"
+                                 constraintName="fk_ictc_sample_collection_visit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_visit"/>
+
+        <addForeignKeyConstraint baseColumnNames="batch_id"
+                                 baseTableName="ictc_sample_collection"
+                                 constraintName="fk_ictc_sample_collection_batch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ictc_sample_batch"/>
+
+    </changeSet>
+</databaseChangeLog>

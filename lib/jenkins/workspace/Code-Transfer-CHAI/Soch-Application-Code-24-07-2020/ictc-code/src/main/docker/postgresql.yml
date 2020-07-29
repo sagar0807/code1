@@ -1,0 +1,11 @@
+version: '2'
+services:
+  sochictc-postgresql:
+    image: postgres:12.1
+    # volumes:
+    #     - ~/volumes/jhipster/sochictc/postgresql/:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=sochictc
+      - POSTGRES_PASSWORD=
+    ports:
+      - 5432:5432

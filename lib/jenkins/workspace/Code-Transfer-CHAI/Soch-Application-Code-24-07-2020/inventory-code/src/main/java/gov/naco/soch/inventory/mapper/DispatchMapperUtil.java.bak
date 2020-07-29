@@ -1,0 +1,322 @@
+package gov.naco.soch.inventory.mapper;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import gov.naco.soch.dto.BatchDto;
+import gov.naco.soch.dto.DispatchBatchDto;
+import gov.naco.soch.dto.DispatchDetailedDto;
+import gov.naco.soch.dto.DispatchDto;
+import gov.naco.soch.dto.DispatchProductDto;
+import gov.naco.soch.entity.Address;
+import gov.naco.soch.entity.Contract;
+import gov.naco.soch.entity.ContractProductSceduleSacsLot;
+import gov.naco.soch.entity.ContractProductSchedule;
+import gov.naco.soch.entity.ContractProductScheduleSac;
+import gov.naco.soch.entity.Dispatch;
+import gov.naco.soch.entity.DispatchBatch;
+import gov.naco.soch.entity.Facility;
+import gov.naco.soch.entity.Product;
+import gov.naco.soch.entity.ProductUomMaster;
+import gov.naco.soch.entity.Supplier;
+import gov.naco.soch.entity.SupplierStock;
+import gov.naco.soch.enums.ConsignmentStatusEnum;
+import gov.naco.soch.enums.DispatchReceiverStatusEnum;
+import gov.naco.soch.enums.DispatchStatusEnum;
+
+public class DispatchMapperUtil {
+
+	public static List<DispatchDto> mapDispatchDtoListToDispatch(List<Dispatch> dispatchList) {
+		List<DispatchDto> dispatchDtos = new ArrayList<DispatchDto>();
+		if (dispatchList != null) {
+			dispatchList.forEach(dispatch -> {
+				DispatchDto dispatchDto = new DispatchDto();
+				dispatchDto.setDispatchId(dispatch.getDispatchId());
+				dispatchDto.setDispatchStatus(dispatch.getDispatchStatus());
+				dispatchDto.setConsignmentStatus(dispatch.getConsignmentStatus());
+				dispatchDto.setInvoiceDate(dispatch.getInvoiceDate());
+				dispatchDto.setInvoiceNumber(dispatch.getInvoiceNumber());
+				if (dispatch.getContract() != null) {
+					dispatchDto.setNoaNumber(dispatch.getContract().getNoaNumber());
+				}
+				if (dispatch.getFacility1() != null) {
+					dispatchDto.setConsignee(dispatch.getFacility1().getName());
+				}
+				if (dispatch.getDispatchBatches() != null) {
+					Integer quantity = 0;
+					for (DispatchBatch a : dispatch.getDispatchBatches()) {
+						quantity = quantity + a.getQuantityNumber();
+					}
+					dispatchDto.setQuantity(quantity);
+				}
+
+				if (dispatch.getContractProductSchedule() != null) {
+					if (dispatch.getContractProductSchedule().getContractProduct() != null) {
+						if (dispatch.getContractProductSchedule().getContractProduct().getProduct() != null) {
+							dispatchDto.setProduct(dispatch.getContractProductSchedule().getContractProduct()
+									.getProduct().getProductName());
+						}
+					}
+
+				}
+				if (dispatch.getContractProductSceduleSacsLot() != null) {
+					String lotNumber = dispatch.getContractProductSceduleSacsLot().getLotNumber();
+					dispatchDto.setLotNumber(lotNumber);
+				}
+
+				dispatchDto.setReceiptStatus(dispatch.getReceiptStatus());
+				dispatchDto.setStnNumber(dispatch.getStnNumber());
+				dispatchDtos.add(dispatchDto);
+			});
+		}
+		return dispatchDtos;
+	}
+
+	public static DispatchDetailedDto mapDispatchToDispatchDetailedDto(Dispatch dispatch) {
+		DispatchDetailedDto dispatchDetailedDto = new DispatchDetailedDto();
+		if (dispatch != null) {
+
+			dispatchDetailedDto.setBatchDetails(null);
+			dispatchDetailedDto.setDispatchId(dispatch.getDispatchId());
+			dispatchDetailedDto.setDriverName(dispatch.getDriverName());
+			dispatchDetailedDto.setExpectedArrivalDate(dispatch.getExpectedArrivalDate());
+			dispatchDetailedDto.setExpectedDispatchDate(dispatch.getExpectedDispatchDate());
+			dispatchDetailedDto.setInvoiceDate(dispatch.getInvoiceDate());
+			dispatchDetailedDto.setInvoiceNumber(dispatch.getInvoiceNumber());
+			dispatchDetailedDto.setReceiptStatus(dispatch.getReceiptStatus());
+			dispatchDetailedDto.setStnNumber(dispatch.getStnNumber());
+			dispatchDetailedDto.setTransporterName(dispatch.getTransporterName());
+			dispatchDetailedDto.setTransporterPhone(dispatch.getTransporterPhone());
+
+			if (dispatch.getFacility1() != null) {
+				dispatchDetailedDto.setBilledToFacilityId(dispatch.getFacility1().getId());
+				dispatchDetailedDto.setBilledToFacilityName(dispatch.getFacility1().getName());
+				if (dispatch.getFacility1().getAddress() != null) {
+					dispatchDetailedDto.setBilledToFacilityAddress(dispatch.getFacility1().getAddress().getAddress());
+				}
+			}
+
+			if (dispatch.getContractProductSceduleSacsLot() != null) {
+				dispatchDetailedDto.setLotNumber(dispatch.getContractProductSceduleSacsLot().getLotNumber());
+			}
+
+			if (dispatch.getContract() != null) {
+				if (dispatch.getContract().getContractProducts() != null) {
+					dispatchDetailedDto.setProductName(dispatch.getContract().getContractProducts().iterator().next()
+							.getProduct().getProductName());
+					dispatchDetailedDto.setProductId(
+							dispatch.getContract().getContractProducts().iterator().next().getProduct().getId());
+				}
+			}
+
+			if (dispatch.getContractProductSchedule() != null) {
+				dispatchDetailedDto.setScheduleNumber(dispatch.getContractProductSchedule().getScheduleNumber());
+			}
+			if (dispatch.getFacility2() != null) {
+				dispatchDetailedDto.setShippedToFacilityId(dispatch.getFacility2().getId());
+				dispatchDetailedDto.setShippedToFacilityName(dispatch.getFacility2().getName());
+				if (dispatch.getFacility2().getAddress() != null) {
+					dispatchDetailedDto.setShippedToFacilityAddress(dispatch.getFacility2().getAddress().getAddress());
+				}
+			}
+		}
+		return dispatchDetailedDto;
+	}
+
+	public static List<BatchDto> mapToBatchDto(List<SupplierStock> supplierStocks) {
+		List<BatchDto> batchDtos = new ArrayList<>();
+		if (supplierStocks != null) {
+			supplierStocks.forEach(supplierStock -> {
+				BatchDto batchDto = new BatchDto();
+				batchDto.setSupplierStockId(supplierStock.getSupplierStockId());
+				batchDto.setBatchNumber(supplierStock.getBatchNumber());
+				batchDto.setExpiryDate(supplierStock.getExpiryDate());
+				batchDto.setManufactureDate(supplierStock.getManufactureDate());
+				batchDtos.add(batchDto);
+			});
+		}
+		return batchDtos;
+	}
+
+	public static Dispatch mapDispatchDtoListToDispatch(DispatchDetailedDto dispatchDetailedDto, Dispatch dispatch) {
+		Contract contract = new Contract();
+		contract.setContractId(dispatchDetailedDto.getContractId());
+		dispatch.setContract(contract);
+		ContractProductSchedule contractProductSchedule = new ContractProductSchedule();
+		contractProductSchedule.setId(dispatchDetailedDto.getScheduleId());
+		contractProductSchedule.setScheduleNumber(dispatchDetailedDto.getScheduleNumber());
+		dispatch.setContractProductSchedule(contractProductSchedule);
+		ContractProductSceduleSacsLot contractProductSceduleSacsLot = new ContractProductSceduleSacsLot();
+		contractProductSceduleSacsLot.setId(dispatchDetailedDto.getLotId());
+		contractProductSceduleSacsLot.setLotNumber(dispatchDetailedDto.getLotNumber());
+        dispatch.setContractProductSceduleSacsLot(contractProductSceduleSacsLot);	
+        dispatch.setInvoiceNumber(dispatchDetailedDto.getInvoiceNumber());
+        dispatch.setInvoiceDate(dispatchDetailedDto.getInvoiceDate());
+        dispatch.setTransporterName(dispatchDetailedDto.getTransporterName());
+        dispatch.setTransporterPhone(dispatchDetailedDto.getTransporterPhone());
+        //
+        dispatch.setDriverName(dispatchDetailedDto.getDriverName());
+        dispatch.setExpectedArrivalDate(dispatchDetailedDto.getExpectedArrivalDate());
+        dispatch.setExpectedDispatchDate(dispatchDetailedDto.getExpectedDispatchDate());
+        Facility facilityBilled = new Facility();
+        facilityBilled.setId(dispatchDetailedDto.getBilledToFacilityId());
+        facilityBilled.setName(dispatchDetailedDto.getBilledToFacilityName());
+        Address addressBilled = new Address();
+        addressBilled.setAddress(dispatchDetailedDto.getBilledToFacilityAddress());
+        facilityBilled.setAddress(addressBilled);
+        dispatch.setFacility1(facilityBilled);
+        Facility facilityShipped = new Facility();
+        facilityShipped.setId(dispatchDetailedDto.getShippedToFacilityId());
+        facilityShipped.setName(dispatchDetailedDto.getShippedToFacilityName());
+        Address addressShipped = new Address();
+        addressShipped.setAddress(dispatchDetailedDto.getShippedToFacilityAddress());
+        facilityShipped.setAddress(addressShipped);
+        dispatch.setFacility2(facilityShipped);
+        Supplier consigner = new Supplier();
+        consigner.setSupplierId(dispatchDetailedDto.getConsignerId());
+        dispatch.setSupplier(consigner);
+        dispatch.setRemarks(dispatchDetailedDto.getRemarks()); 
+        dispatch.setConsignmentStatus(dispatchDetailedDto.getConsignementStatus());
+        dispatch.setReceiptStatus(dispatchDetailedDto.getReceiptStatus());
+        dispatch.setDispatchStatus(dispatchDetailedDto.getDispatchStatus());
+        //
+        Set<DispatchBatch> dispatchBatches = maptoDispatchBatchDtoToDispatchBaches(dispatchDetailedDto.getBatchDetails(),dispatch);
+        dispatch.setDispatchBatches(dispatchBatches);
+        return dispatch;
+	}
+
+	public static Dispatch mapDispatchDtoListToDispatch(DispatchDetailedDto dispatchDetailedDto) {
+		Random rand = new Random();
+		int upperbound = 10000;
+		Dispatch dispatch = new Dispatch();
+		Contract contract = new Contract();
+		contract.setContractId(dispatchDetailedDto.getContractId());
+		dispatch.setContract(contract);
+		ContractProductSchedule contractProductSchedule = new ContractProductSchedule();
+		contractProductSchedule.setId(dispatchDetailedDto.getScheduleId());
+		contractProductSchedule.setScheduleNumber(dispatchDetailedDto.getScheduleNumber());
+		dispatch.setContractProductSchedule(contractProductSchedule);
+		ContractProductSceduleSacsLot contractProductSceduleSacsLot = new ContractProductSceduleSacsLot();
+		contractProductSceduleSacsLot.setId(dispatchDetailedDto.getLotId());
+		contractProductSceduleSacsLot.setLotNumber(dispatchDetailedDto.getLotNumber());
+        dispatch.setContractProductSceduleSacsLot(contractProductSceduleSacsLot);	
+        dispatch.setInvoiceNumber(dispatchDetailedDto.getInvoiceNumber());
+        dispatch.setInvoiceDate(dispatchDetailedDto.getInvoiceDate());
+        dispatch.setTransporterName(dispatchDetailedDto.getTransporterName());
+        dispatch.setTransporterPhone(dispatchDetailedDto.getTransporterPhone());
+        dispatch.setStnNumber("Stn" + rand.nextInt(upperbound));
+        
+        //
+        dispatch.setDriverName(dispatchDetailedDto.getDriverName());
+        dispatch.setExpectedArrivalDate(dispatchDetailedDto.getExpectedArrivalDate());
+        dispatch.setExpectedDispatchDate(dispatchDetailedDto.getExpectedDispatchDate());
+        Facility facilityBilled = new Facility();
+        facilityBilled.setId(dispatchDetailedDto.getBilledToFacilityId());
+        facilityBilled.setName(dispatchDetailedDto.getBilledToFacilityName());
+        Address addressBilled = new Address();
+        addressBilled.setAddress(dispatchDetailedDto.getBilledToFacilityAddress());
+        facilityBilled.setAddress(addressBilled);
+        dispatch.setFacility1(facilityBilled);
+        Facility facilityShipped = new Facility();
+        facilityShipped.setId(dispatchDetailedDto.getShippedToFacilityId());
+        facilityShipped.setName(dispatchDetailedDto.getShippedToFacilityName());
+        Address addressShipped = new Address();
+        addressShipped.setAddress(dispatchDetailedDto.getShippedToFacilityAddress());
+        facilityShipped.setAddress(addressShipped);
+        dispatch.setFacility2(facilityShipped);
+        Supplier consigner = new Supplier();
+        consigner.setSupplierId(dispatchDetailedDto.getConsignerId());
+        dispatch.setSupplier(consigner);
+        dispatch.setRemarks(dispatchDetailedDto.getRemarks());
+        dispatch.setConsignmentStatus(ConsignmentStatusEnum.PENDING.getConsignmentStatus());
+        dispatch.setReceiptStatus(DispatchReceiverStatusEnum.PENDING.getDispatchReceiverStatus());
+        dispatch.setDispatchStatus(DispatchStatusEnum.DISPATCHED.getDispatchStatus());
+        //
+        
+        Set<DispatchBatch> dispatchBatches = maptoDispatchBatchDtoToDispatchBaches(dispatchDetailedDto.getBatchDetails());
+        dispatch.setDispatchBatches(dispatchBatches);
+        return dispatch;
+	}
+
+	private static Set<DispatchBatch> maptoDispatchBatchDtoToDispatchBaches(List<BatchDto> batchDetails) {
+
+		Set<DispatchBatch> batches = new HashSet<DispatchBatch>();
+		for (BatchDto batchDto : batchDetails) {
+			DispatchBatch batch = new DispatchBatch();
+			SupplierStock supplierStock = new SupplierStock();
+			supplierStock.setSupplierStockId(batchDto.getSupplierStockId());
+			batch.setSupplierStock(supplierStock);
+			batch.setQuantityNumber(batchDto.getQuantity());
+			batches.add(batch);
+		}
+		return batches;
+	}
+
+	private static Set<DispatchBatch> maptoDispatchBatchDtoToDispatchBaches(List<BatchDto> batchDetails,
+			Dispatch dispatch) {
+
+		// Set<DispatchBatch> batches = new HashSet<DispatchBatch>();
+		for (BatchDto batchDto : batchDetails) {
+			DispatchBatch batch = new DispatchBatch();
+			SupplierStock supplierStock = new SupplierStock();
+			supplierStock.setBatchNumber(batchDto.getBatchNumber());
+			Product product = new Product();
+			product.setId(batchDto.getProductId());
+			supplierStock.setProduct(product);
+			batch.setSupplierStock(supplierStock);
+			batch.setQuantityNumber(batchDto.getQuantity());
+			batch.setDispatch(dispatch);
+			dispatch.getDispatchBatches().add(batch);
+		}
+		return dispatch.getDispatchBatches();
+	}
+
+	public static List<DispatchProductDto> mapSupplierStockListToDispatchProductDtoList(List<SupplierStock> stocks) {
+		List<DispatchProductDto> dispatchProductDtos = new ArrayList<DispatchProductDto>();
+		if (stocks != null) {
+			Long productId = 0l;
+			for (SupplierStock stock : stocks) {
+				if (productId != stock.getProduct().getId()) {
+					DispatchProductDto dispatchProductDto = new DispatchProductDto();
+					Product product = stock.getProduct();
+					productId = product.getId();
+					dispatchProductDto.setProductId(product.getId());
+					dispatchProductDto.setProductCode(product.getProductCode());
+					dispatchProductDto.setProductName(product.getProductName());
+					ProductUomMaster productUomMaster = product.getProductUomMaster();
+					dispatchProductDto.setUom(productUomMaster.getUomName());
+					dispatchProductDto.setBatchDtos(mapstockToBatchDtos(dispatchProductDto, stocks));
+					dispatchProductDtos.add(dispatchProductDto);
+				}
+
+			}
+
+		}
+		return dispatchProductDtos;
+	}
+
+	private static List<BatchDto> mapstockToBatchDtos(DispatchProductDto dispatchProductDto,
+			List<SupplierStock> stocks) {
+		System.out.println("dispatchProductDto.productId :" + dispatchProductDto.getProductId());
+		List<BatchDto> batchDtos = new ArrayList<BatchDto>();
+		for (SupplierStock stock : stocks) {
+			if (dispatchProductDto.getProductId() == stock.getProduct().getId()) {
+				System.out.println("if(dispatchProductDto.getProductId() == stock.getProduct().getId())  :"
+						+ dispatchProductDto.getProductId() + ", " + stock.getProduct().getId());
+				BatchDto batchDto = new BatchDto();
+				batchDto.setBatchNumber(stock.getBatchNumber());
+				batchDto.setManufactureDate(stock.getManufactureDate());
+				batchDto.setSupplierStockId(stock.getSupplierStockId());
+				System.out.println("batchDto.getSupplierStockId() :" + batchDto.getSupplierStockId());
+				batchDto.setExpiryDate(stock.getExpiryDate());
+				batchDtos.add(batchDto);
+			}
+		}
+
+		return batchDtos;
+	}
+
+}

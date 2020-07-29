@@ -1,0 +1,11 @@
+id;lab_id;consignment_id;dispatch_date;batch_status;facility_id;created_by;created_time;modified_by;modified_time;is_active;is_deleted
+1;14033;Sausages;2020-04-22;infomediaries viral;89914;73920;2020-04-23;37019;2020-04-23;true;false
+2;21626;payment connecting Public-key;2020-04-23;Finland;75316;41232;2020-04-23;69875;2020-04-22;true;false
+3;45067;Bike;2020-04-23;Solutions;27541;33620;2020-04-23;37371;2020-04-22;false;true
+4;44873;Frozen;2020-04-22;Berkshire;31531;71965;2020-04-22;50931;2020-04-23;false;true
+5;34661;Incredible;2020-04-22;initiative reboot Customer-focused;6971;19376;2020-04-22;97384;2020-04-22;true;true
+6;10787;Director pink;2020-04-22;Agent;38911;15369;2020-04-22;45794;2020-04-22;false;true
+7;97879;invoice capacity;2020-04-23;programming input;57172;37532;2020-04-23;88514;2020-04-23;true;true
+8;53702;supply-chains Plastic;2020-04-23;Creative North Carolina Generic;12202;61397;2020-04-22;52177;2020-04-23;false;false
+9;10414;Table calculate cross-platform;2020-04-23;deploy;66919;75755;2020-04-22;77831;2020-04-22;false;true
+10;37382;Handcrafted Concrete Pants;2020-04-22;bandwidth partnerships Georgia;1673;40140;2020-04-22;98270;2020-04-22;true;false

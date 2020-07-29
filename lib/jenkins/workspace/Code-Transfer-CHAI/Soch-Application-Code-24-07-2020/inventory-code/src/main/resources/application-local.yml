@@ -1,0 +1,41 @@
+spring:
+   jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      database: POSTGRESQL
+      generate-ddl: false
+      open-in-view: false
+      show-sql: true
+      hibernate:
+         ddl-auto: none
+         use-new-id-generator-mappings: false
+   datasource:
+       dataSourceClassName: org.postgresql.Driver
+       url: jdbc:postgresql://localhost:5432/soch_dev_db?currentSchema=soch
+       username: postgres
+       password: postgres
+logging:
+   level:
+       root: INFO
+       org.springframework: INFO
+       com.naco.soch: INFO
+       org.hibernate: INFO
+notification:
+   emailServiceUrl: http://localhost:8085/notification/sendemail/
+   smsServiceUrl: http://localhost:8085/notification/sendsms/
+   whatsappServiceUrl: http://localhost:8085/notification/sendwhatsapp/
+cmss:
+    external:
+        stock:
+            url: https://cmss.dcservices.in/eAushadhi_CMSS/rest/cmssStock/109/998/1/1
+            username: cmss_ws_client
+            password: cm55_C|ient
+        indent:
+            url: https://cmss.dcservices.in/DWH_CMSS/services/restful/DataService/DATAJSON/Indent
+            username: naco
+            password: naco2019
+        issues:
+            url: https://cmss.dcservices.in/DWH_CMSS/services/restful/DataService/DATAJSON/Issue
+            username: naco
+            password: naco2019
+            
+            

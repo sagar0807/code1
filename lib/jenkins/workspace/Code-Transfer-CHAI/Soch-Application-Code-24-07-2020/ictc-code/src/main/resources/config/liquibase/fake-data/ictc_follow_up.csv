@@ -1,0 +1,11 @@
+id;follow_up_type;follow_up_date;beneficiary_id;facility_id;remarks;is_completed;created_by;created_time;modified_by;modified_time;is_active;is_deleted;visit_id
+1;Automotive Internal driver;2020-04-23;30722;34471;Metal;false;12054;2020-04-22;9215;2020-04-22;false;true;1
+2;Neck Table SDD;2020-04-22;57323;88254;global bus Plastic;true;57381;2020-04-22;72431;2020-04-22;true;true;2
+3;viral;2020-04-22;25218;28593;payment interface;false;35626;2020-04-22;45836;2020-04-22;true;false;3
+4;Borders Nuevo Sol Movies;2020-04-23;33563;57414;multi-byte violet;true;24144;2020-04-22;17507;2020-04-22;false;false;4
+5;input Gorgeous;2020-04-22;44856;8016;Dynamic AI;false;67827;2020-04-22;30763;2020-04-22;false;false;5
+6;Metal;2020-04-22;80830;76715;open-source Producer invoice;true;82033;2020-04-23;16149;2020-04-22;false;true;6
+7;Hat Cotton cross-platform;2020-04-23;83276;72528;collaborative middleware Forward;false;61607;2020-04-22;85149;2020-04-23;true;false;7
+8;sky blue North Korean Won;2020-04-22;31321;74663;Common HTTP;false;33536;2020-04-22;81036;2020-04-22;true;true;8
+9;Chile leading-edge system;2020-04-22;97293;77789;multi-byte empower;false;92793;2020-04-23;11863;2020-04-22;false;true;9
+10;Wooden South Carolina;2020-04-22;62338;20218;SDD Customer-focused Steel;true;49184;2020-04-22;95074;2020-04-22;false;false;10

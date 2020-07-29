@@ -1,0 +1,121 @@
+package gov.naco.soch.inventory.mapper;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.Valid;
+
+import gov.naco.soch.dto.AcceptConsignmentDto;
+import gov.naco.soch.dto.BatchDto;
+import gov.naco.soch.dto.ConsignmentBatchDto;
+import gov.naco.soch.dto.ReceiptDto;
+import gov.naco.soch.dto.ReceiptSupplierDto;
+import gov.naco.soch.entity.Contract;
+import gov.naco.soch.entity.ContractProduct;
+import gov.naco.soch.entity.Dispatch;
+import gov.naco.soch.entity.DispatchBatch;
+import gov.naco.soch.entity.DispatchReceiptRemark;
+import gov.naco.soch.entity.DispatchStatusMaster;
+import gov.naco.soch.entity.Grn1StatusMaster;
+import gov.naco.soch.entity.Grn2StatusMaster;
+import gov.naco.soch.entity.Product;
+import gov.naco.soch.entity.Receipt;
+import gov.naco.soch.entity.ReceiptBatch;
+import gov.naco.soch.entity.ReceiptStatusMaster;
+
+public class ReceiptMapperUtil {
+
+	public static List<ReceiptSupplierDto> mappDispatchListToReceiptSupplierDto(List<Receipt> receiptList,
+			String user) {
+		List<ReceiptSupplierDto> receiptSupplierDtos = new ArrayList<ReceiptSupplierDto>();
+		if (receiptList != null) {
+			for (Receipt receipt : receiptList) {
+				ReceiptSupplierDto receiptSupplierDto = new ReceiptSupplierDto();
+				receiptSupplierDto.setReceiptId(receipt.getId());
+				Grn1StatusMaster grn1StatusMaster = receipt.getGrn1StatusMaster();
+				receiptSupplierDto.setGrn1(grn1StatusMaster.getStatus());
+				if (user.equalsIgnoreCase("statesystemadmin") && user != null) {
+					Grn2StatusMaster grn2StatusMaster = receipt.getGrn2StatusMaster();
+					receiptSupplierDto.setGrn2(grn2StatusMaster.getStatus());
+				}
+				Dispatch dispatch = receipt.getDispatch();
+				receiptSupplierDto.setDispatchId(dispatch.getDispatchId());
+				receiptSupplierDto.setStnNo(dispatch.getStnNumber());
+				receiptSupplierDto.setInvoiceNo(dispatch.getInvoiceNumber());
+				Contract contract = dispatch.getContract();
+				receiptSupplierDto.setProducts(mapContractProductsToreceiptSupplierDto(contract.getContractProducts()));
+				ReceiptStatusMaster receiptStatusMaster = receipt.getReceiptStatusMaster();
+				receiptSupplierDto.setReceiptStatus(receiptStatusMaster.getStatus());
+				receiptSupplierDtos.add(receiptSupplierDto);
+			}
+		}
+		return receiptSupplierDtos;
+	}
+
+	private static List<String> mapContractProductsToreceiptSupplierDto(Set<ContractProduct> contractProducts) {
+		List<String> products = new ArrayList<String>();
+		for (ContractProduct contractProduct : contractProducts) {
+			Product product = contractProduct.getProduct();
+			String productName = product.getProductName();
+			products.add(productName);
+		}
+		return products;
+	}
+
+	public static Set<DispatchReceiptRemark> mapReceiptDtoToDispatchReceiptRemark(@Valid ReceiptDto receiptDto,
+			Dispatch dispatch, Receipt receipt, Integer receiptStatusId, Integer dispatchStatusId) {
+
+		Set<DispatchReceiptRemark> remarks = new HashSet<>();
+		DispatchReceiptRemark remark = new DispatchReceiptRemark();
+		remark.setRemarks(receiptDto.getRemark());
+		DispatchStatusMaster dispatchStatusMaster = new DispatchStatusMaster();
+		dispatchStatusMaster.setId(dispatchStatusId);
+		ReceiptStatusMaster receiptStatusMaster = new ReceiptStatusMaster();
+		receiptStatusMaster.setId(receiptStatusId);
+		remark.setReceiptStatusMaster(receiptStatusMaster);
+		remark.setDispatchStatusMaster(dispatchStatusMaster);
+		remark.setDispatch(dispatch);
+		remark.setReceipt(receipt);
+		remarks.add(remark);
+		return remarks;
+	}
+
+	public static Set<ReceiptBatch> mapBatchDtoToReceiptBatches(List<BatchDto> batches, Receipt receipt) {
+		Set<ReceiptBatch> receiptBatches = new HashSet<>();
+		if (batches != null) {
+			batches.forEach(batch -> {
+				ReceiptBatch receiptBatch = new ReceiptBatch();
+				receiptBatch.setDamagedQuantity(batch.getDamagedQuantity());
+				DispatchBatch dispatchBatch = new DispatchBatch();
+				dispatchBatch.setId(batch.getDispatchBatchId());
+				receiptBatch.setDispatchBatch(dispatchBatch);
+				receiptBatch.setReceipt(receipt);
+				receiptBatch.setQuantityReceived(batch.getReceivedQuantity());
+				receiptBatches.add(receiptBatch);
+			});
+		}
+		return receiptBatches;
+	}
+
+	public static Receipt mapConsignmentBatchDtoToreceiptUpdate(Receipt receipt,AcceptConsignmentDto acceptConsignmentDto) {
+		
+		for(ReceiptBatch receiptBatch : receipt.getReceiptBatches()) {
+			DispatchBatch dispatchBatch = receiptBatch.getDispatchBatch();
+			
+		}
+//		for(ConsignmentBatchDto consignmentBatchDto : acceptConsignmentDto.getConsignmentBatches()) {
+//			
+//			
+//			ReceiptBatch batch = new ReceiptBatch();
+//			batch.setId(consignmentBatchDto.getBatchId());
+//			batch.setQuantityReceived(consignmentBatchDto.getReceivedQuantity());
+//			batch.setDamagedQuantity(consignmentBatchDto.getDamagedQty());
+//			receiptBatches.add(batch);	
+//		}
+//		receipt.setReceiptBatches(receiptBatches);
+		return receipt;
+	}
+
+}

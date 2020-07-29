@@ -1,0 +1,27 @@
+spring:
+   jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      database: POSTGRESQL
+      generate-ddl: false
+      open-in-view: false
+      show-sql: true
+      hibernate:
+         ddl-auto: none
+         use-new-id-generator-mappings: true
+         format_sql: true
+   datasource:
+      dataSourceClassName: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/soch-db-dev?currentSchema=soch
+      username: postgres
+      password: postgres
+      logging:
+logging:
+   level:
+       root: INFO
+       org.springframework: INFO
+       com.naco.soch: INFO
+       org.hibernate: INFO
+notification:
+   emailServiceUrl: http://localhost:8080/notification/sendemail/
+   smsServiceUrl: http://localhost:8080/notification/sendsms/
+   whatsappServiceUrl: http://localhost:8080/notification/sendwhatsapp/ 

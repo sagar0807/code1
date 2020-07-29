@@ -1,0 +1,26 @@
+spring:
+   jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      database: POSTGRESQL
+      generate-ddl: false
+      open-in-view: false
+      show-sql: false
+      hibernate:
+         ddl-auto: none
+         use-new-id-generator-mappings: false
+         format_sql: true
+   datasource:
+      dataSourceClassName: org.postgresql.Driver
+      url: jdbc:postgresql://13.234.214.47:5432/mig_db01?currentSchema=soch
+      username: postgres
+      password: sanju@123
+logging:
+   level:
+       root: ERROR
+       org.springframework: ERROR
+       com.naco.soch: ERROR
+       org.hibernate: ERROR
+notification:
+   emailServiceUrl: http://localhost:8080/notification/sendemail/
+   smsServiceUrl: http://localhost:8080/notification/sendsms/
+   whatsappServiceUrl: http://localhost:8080/notification/sendwhatsapp/
